@@ -1,0 +1,25 @@
+variable "project_id" {
+  type = string
+}
+
+variable  "regions" {
+  type = map(object({
+    region            = string
+    network           = string
+    subnetwork        = string
+    ip_range_pods     = string
+    ip_range_services = string
+  }))
+}
+
+module "kubernetes_cluster" {
+  source   = "terraform-google-modules/kubernetes-engine/google"
+  for_each = var.regions
+
+  project_id        = var.project_id
+  name              = each.key
+  region            = each.value.region
+  network           = each.value.network
+  subnetwork        = each.value.subnetwork
+  ip_range_pods     = each.value.ip_range_pods
+  ip_range_services = each.value.ip_range_services
